@@ -91,6 +91,8 @@ export default function Home() {
     const mapLat:any = 33.450701
     const mapLng:any = 126.570667
 
+    const kakao = (window as any).kakao
+
     kakao.maps.load(() => {
       const container = document.querySelector('#kakaoMap')
       const mapOption = {
@@ -187,9 +189,9 @@ export default function Home() {
         <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&family=Roboto:wght@300;400&display=swap" rel="stylesheet"/>
       </Head>
       <div id="kakaoMap" style={{width:'100vw', height:'100vh'}}></div>
-      <div className="absolute z-[100] top-[80px] right-[100px] rounded-lg bg-white shadow-lg">
+      <div className="absolute z-[100] top-[20px] right-[20px] rounded-lg bg-white shadow-lg">
         <div className="p-2 bg-gray-800 font-semibold text-white rounded-tl-lg rounded-tr-lg">클다방 카페 목록</div>
-        <ul id="dabangList" className="max-h-[500px] overflow-y-scroll p-0 m-0 list-none font-['Noto Sans KR'] text-sm">
+        <ul id="dabangList" className="max-h-[220px] overflow-y-scroll p-0 m-0 list-none font-['Noto Sans KR'] text-sm">
           {
             dabangList.map((ele, idx)=> {
               return(<li key={idx} className="p-2">
