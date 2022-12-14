@@ -1,17 +1,10 @@
 import { useEffect, useState } from 'react'
-import Head from 'next/head'
 import home from  '../styles/Home.module.css'
-
-declare global {
-  interface Window {
-    kakao: any;
-  }
-}
 
 export default function Home() {
   const [mapLoaded, setMapLoaded] = useState<boolean>(false)
+  const [listView, setListView] = useState<boolean>(false)
 
-  //const kakaoAPI_KEY = "66dd76d3cb5d55be4db72039e50b5e08"
   const kakaoAPI_KEY = process.env.NEXT_PUBLIC_KAKAOKEY
 
   const kakaoAPI_URL = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoAPI_KEY}&autoload=false&libraries=services`
@@ -57,33 +50,6 @@ export default function Home() {
     { region: '제주', nickname: '위노', company: 'RVO어반 브루잉', address: '제주특별자치도 제주시 신설로 9길 42-8, 103호', comment: '', url: 'https://www.instagram.com/urban.brewing', tel: '' },
     //{ nickname: '', company: '', address: '', lat: , lng: },
   ]
-
-  /*const loadMap = (mapLat:any, mapLng:any) => {
-    if(!mapLat || !mapLng) {
-      console.log('NOT')
-      return 
-    }
-
-    console.log('반응!')
-
-    kakao.maps.load(() => {
-      const container = document.querySelector('#kakaoMap')
-      const mapOption = {
-        center: new kakao.maps.LatLng(mapLat, mapLng),
-        level: 1
-      }
-
-      const markerPosition = new kakao.maps.LatLng(mapLat, mapLng)
-
-      const mapMarker = new kakao.maps.Marker({
-        position: markerPosition
-      })
-
-      const map = new kakao.maps.Map(container, mapOption)
-
-      mapMarker.setMap(map)
-    })
-  }*/
   
   const loadMap = (address: any, idx:number) => {
     if(!address) return
@@ -109,32 +75,23 @@ export default function Home() {
         if (status === kakao.maps.services.Status.OK) {
           const coords = new kakao.maps.LatLng(result[0].y, result[0].x)
 
-          //const markerPosition = new kakao.maps.LatLng(mapLat, mapLng)
+          let comment = '', url = '', tel = '', address = '';
 
-          let comment = '', url = '', tel = '';
-
-          if(dabangList[idx].comment) comment = `<div class="px-1">${dabangList[idx].comment}</div>`
-          if(dabangList[idx].url) url = `<div class="px-1"><a href="${dabangList[idx].url}" target="_blank">${dabangList[idx].url}</div>`
-          if(dabangList[idx].tel) tel = `<div class="px-1"><a href="tel:${dabangList[idx].tel}">${dabangList[idx].tel}</a></div>`
+          if(dabangList[idx].comment) comment = `<div class="w-full py-1"><div class="block w-full font-semibold"><i class="ri-message-3-line text-gray-600 mr-1"></i> 기타 안내사항</div><div class="block w-full pl-[18px] pt-[5px] ml-1">${dabangList[idx].comment}</div></div>`
+          if(dabangList[idx].url) url = `<div class="w-full py-1"><i class="ri-home-6-line text-gray-600 font-semibold mr-1"></i> <a href="${dabangList[idx].url}" target="_blank">사이트 바로가기</a></div>`
+          if(dabangList[idx].tel) tel = `<div class="w-full py-1"><i class="ri-phone-fill text-gray-600 font-semibold mr-1"></i> <a href="tel:${dabangList[idx].tel}">${dabangList[idx].tel}</a></div>`
+          if(dabangList[idx].address) address = `<div class="w-full py-1 cursor-pointer" onclick="navigator.clipboard.writeText('${dabangList[idx].address}');alert('클립보드에 복사되었습니다!')"><i class="ri-map-pin-2-fill text-gray-600 font-semibold mr-1"></i> ${dabangList[idx].address}</div>`
 
           
-          const content = `<div class=${home.wrap}>` +
-                          ` <div class=${home.info}>` +
-                          `   <div class=${home.title}>` +
-                          `     ${dabangList[idx].company}` +
+          const content = `<div class="absolute rounded-lg w-[280px] ml-[-140px] z-[50] bg-white left-0 bottom-[60px] text-sm" id="dabangComment">` +
+                          `   <div class="w-full bg-neutral-300 p-2 font-semibold">[${dabangList[idx].region}] ${dabangList[idx].company}</div>` +
+                          `   <div class="w-full bg-white min-h-[100px] p-2 truncate whitespace-normal">` +
+                          `     ${address}` +
+                          `     ${tel}` +
+                          `     ${url}` +
+                          `     ${comment}` +
                           `   </div>` +
-                          `   <div class="p-2">` +
-                          //`     <div class=${home.img}></div>` +
-                          //`     <div class=${home.desc}>` +
-                          `       <div class="p-[10px]"><a href="javascript:;" onclick="navigator.clipboard.writeText('${dabangList[idx].address}');alert('클립보드에 복사되었습니다!')">${dabangList[idx].address}</a></div>` +
-                          `       ${comment}`+
-                          `       ${tel}`+
-                          `       ${url}`+
-                          //`     </div>` +
-                          `   </div>` +
-                          ` </div>` +
-                          `</div>`
-          
+                          `</div>`        
 
           const map = new kakao.maps.Map(container, mapOption)
 
@@ -164,6 +121,14 @@ export default function Home() {
     })
   }
 
+  const menuHandler = () => {
+    const dabangListShow = document.querySelector('#dabangListHidden')
+    const dabangList = document.querySelector('#dabangListShow')
+    
+    dabangListShow?.classList.toggle('hidden')
+    dabangList?.classList.toggle('hidden')
+  }
+
   useEffect(() => {
     const $script = document.createElement('script')
     $script.src   = kakaoAPI_URL
@@ -182,27 +147,31 @@ export default function Home() {
   /* dabangList  style={{padding: '0px', margin: '0px', listStyle: 'none'}} */
   return (
     <>
-      <Head>
-        <title>클다방 목록</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com"/>
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true"/>
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500&family=Roboto:wght@300;400&display=swap" rel="stylesheet"/>
-      </Head>
       <div id="kakaoMap" style={{width:'100vw', height:'100vh'}}></div>
-      <div className="absolute z-[100] top-[20px] right-[20px] rounded-lg bg-white shadow-lg">
-        <div className="p-2 bg-gray-800 font-semibold text-white rounded-tl-lg rounded-tr-lg">클다방 카페 목록</div>
-        <ul id="dabangList" className="max-h-[220px] overflow-y-scroll p-0 m-0 list-none font-['Noto Sans KR'] text-sm">
-          {
-            dabangList.map((ele, idx)=> {
-              return(<li key={idx} className="p-2">
-                <p style={{margin: '0px'}} id="company">
-                  <a href="#" onClick={() => loadMap(ele.address, idx)}>{ele.company}
-                  </a>
-                </p>
-              </li>)
-            })
-          }
-        </ul>
+      <div className="absolute z-[100] bottom-[20px] right-[20px] rounded-lg shadow-lg">
+        <div id="dabangListHidden" className="w-14 h-14 bg-gray-800 font-semibold text-white rounded-full flex items-center text-center cursor-pointer" onClick={() => menuHandler()}>
+          <i className="ri-menu-line m-auto text-xl"></i>
+        </div>
+        <div id="dabangListShow" className="hidden">
+          <div className="p-2 bg-gray-800 font-semibold text-white rounded-tl-lg rounded-tr-lg flex justify-between">
+            <div><i className="ri-cup-line font-normal"></i> 클다방 카페 목록</div>
+            <a onClick={() => menuHandler()}>
+              <i className="ri-close-line cursor-pointer"></i>
+            </a>
+          </div>
+          <ul className="font-black font-normal bg-white max-h-[220px] overflow-y-scroll p-0 m-0 list-none font-['Noto Sans KR'] text-sm">
+            {
+              dabangList.map((ele, idx)=> {
+                return(<li key={idx} className="p-2">
+                  <p style={{margin: '0px'}} id="company">
+                    <a href="#" onClick={() => loadMap(ele.address, idx)}>[{ele.region}] {ele.company}
+                    </a>
+                  </p>
+                </li>)
+              })
+            }
+          </ul>
+        </div>
       </div>
     </>
   )
