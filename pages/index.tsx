@@ -75,17 +75,19 @@ export default function Home() {
         if (status === kakao.maps.services.Status.OK) {
           const coords = new kakao.maps.LatLng(result[0].y, result[0].x)
 
-          let comment = '', url = '', tel = '', address = '';
+          let comment = '', url = '', tel = '', address = '', user ='';
 
           if(dabangList[idx].comment) comment = `<div class="w-full py-1"><div class="block w-full font-semibold"><i class="ri-message-3-line text-gray-600 mr-1"></i> 기타 안내사항</div><div class="block w-full pl-[18px] pt-[5px] ml-1">${dabangList[idx].comment}</div></div>`
           if(dabangList[idx].url) url = `<div class="w-full py-1"><i class="ri-home-6-line text-gray-600 font-semibold mr-1"></i> <a href="${dabangList[idx].url}" target="_blank">사이트 바로가기</a></div>`
           if(dabangList[idx].tel) tel = `<div class="w-full py-1"><i class="ri-phone-fill text-gray-600 font-semibold mr-1"></i> <a href="tel:${dabangList[idx].tel}">${dabangList[idx].tel}</a></div>`
-          if(dabangList[idx].address) address = `<div class="w-full py-1 cursor-pointer" onclick="navigator.clipboard.writeText('${dabangList[idx].address}');alert('클립보드에 복사되었습니다!')"><i class="ri-map-pin-2-fill text-gray-600 font-semibold mr-1"></i> ${dabangList[idx].address}</div>`
+          if(dabangList[idx].address) address = `<div className="w-full py-1 cursor-pointer" onclick="navigator.clipboard.writeText('${dabangList[idx].address}');alert('클립보드에 복사되었습니다!')"><i class="ri-map-pin-2-fill text-gray-600 font-semibold mr-1"></i> ${dabangList[idx].address}</div>`
+          if(dabangList[idx].nickname) user = `<div class="w-full py-1"><i class="ri-user-line text-gray-600 font-semibold mr-2"></i>${dabangList[idx].nickname}</div>`
 
           
           const content = `<div class="absolute rounded-lg w-[280px] ml-[-140px] z-[50] bg-white left-0 bottom-[60px] text-sm" id="dabangComment">` +
                           `   <div class="w-full bg-neutral-300 p-2 font-semibold">[${dabangList[idx].region}] ${dabangList[idx].company}</div>` +
                           `   <div class="w-full bg-white min-h-[100px] p-2 truncate whitespace-normal">` +
+                          `     ${user}` +
                           `     ${address}` +
                           `     ${tel}` +
                           `     ${url}` +
